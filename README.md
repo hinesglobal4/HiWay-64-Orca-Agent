@@ -151,6 +151,24 @@ Final Report
 
 ---
 
+## Architecture Decisions
+
+### Why deterministic planning?
+
+Many agent systems allow LLMs to create arbitrary workflows.
+
+This project intentionally uses a deterministic Planner Agent to:
+
+- improve reliability
+- reduce hallucinations
+- simplify debugging
+- provide predictable execution graphs
+
+LLMs are used for reasoning tasks while workflow orchestration
+remains code-driven.
+
+---
+
 ## Why This Project
 
 This project demonstrates:
