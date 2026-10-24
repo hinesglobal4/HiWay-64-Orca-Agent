@@ -21,82 +21,97 @@ export class PlannerAgent {
     const normalizedQuery =
       query.trim().toLowerCase();
 
+    const researchTaskId =
+      crypto.randomUUID();
+
+    const riskTaskId =
+      crypto.randomUUID();
+
+    const comparisonTaskId =
+      crypto.randomUUID();
+
+    const summaryTaskId =
+      crypto.randomUUID();
+
     const tasks: AgentTask[] = [];
 
-    tasks.push(
-      this.createResearchTask(query)
-    );
+    //
+    // Research Task
+    //
+    tasks.push({
+      id: researchTaskId,
+      agent: "research",
+      objective: query,
+      priority: 1,
+      dependsOn: [],
+      status: "pending"
+    });
 
-    tasks.push(
-      this.createRiskTask(query)
-    );
+    //
+    // Risk Task
+    //
+    tasks.push({
+      id: riskTaskId,
+      agent: "risk",
+      objective: query,
+      priority: 1,
+      dependsOn: [],
+      status: "pending"
+    });
 
-    if (
+    //
+    // Optional Comparison Task
+    //
+    const comparisonEnabled =
       this.requiresComparison(
         normalizedQuery
-      )
-    ) {
-      tasks.push(
-        this.createComparisonTask(
-          query
-        )
       );
-    }
 
-    tasks.push(
-      this.createSummaryTask()
-    );
+    if (comparisonEnabled) {
+
+      tasks.push({
+        id: comparisonTaskId,
+        agent: "comparison",
+        objective: query,
+        priority: 1,
+        dependsOn: [],
+        status: "pending"
+      });
+
+      tasks.push({
+        id: summaryTaskId,
+        agent: "summary",
+        objective:
+          "Create final synthesis from all agent outputs.",
+        priority: 999,
+        dependsOn: [
+          researchTaskId,
+          riskTaskId,
+          comparisonTaskId
+        ],
+        status: "pending"
+      });
+
+    } else {
+
+      tasks.push({
+        id: summaryTaskId,
+        agent: "summary",
+        objective:
+          "Create final synthesis from all agent outputs.",
+        priority: 999,
+        dependsOn: [
+          researchTaskId,
+          riskTaskId
+        ],
+        status: "pending"
+      });
+
+    }
 
     return {
       query,
       tasks
-    };
-  }
-
-  private createResearchTask(
-    query: string
-  ): AgentTask {
-
-    return {
-      id: crypto.randomUUID(),
-      agent: "research",
-      objective: query,
-      priority: 1
-    };
-  }
-
-  private createRiskTask(
-    query: string
-  ): AgentTask {
-
-    return {
-      id: crypto.randomUUID(),
-      agent: "risk",
-      objective: query,
-      priority: 2
-    };
-  }
-
-  private createComparisonTask(
-    query: string
-  ): AgentTask {
-
-    return {
-      id: crypto.randomUUID(),
-      agent: "comparison",
-      objective: query,
-      priority: 3
-    };
-  }
-
-  private createSummaryTask(): AgentTask {
-
-    return {
-      id: crypto.randomUUID(),
-      agent: "summary",
-      objective:
-        "Synthesize all agent outputs into a final response.",
-      priority: 999
     };
   }
 
@@ -110,4 +125,31 @@ export class PlannerAgent {
         query.includes(term)
       );
   }
-}
+
+  public getExecutableTasks(
+    tasks: AgentTask[]
+  ): AgentTask[] {
+
+    const completedTasks =
+      new Set(
+        tasks
+          .filter(
+            task =>
+              task.status === "completed"
+          )
+          .map(
+            task =>
+              task.id
+          )
+      );
+
+    return tasks.filter(task => {
+
+      if (
+        task.status !== "pending"
+      ) {
+        return false;
+      }
+
+      return task.dependsOn.every(
+ 
