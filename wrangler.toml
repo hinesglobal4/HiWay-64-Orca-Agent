@@ -1,1 +1,19 @@
-holder
+name = "hi-way-orca-agent"
+
+main = "src/index.ts"
+
+compatibility_date = "2026-10-20"
+
+[ai]
+binding = "AI"
+
+[[durable_objects.bindings]]
+name = "SESSION_MEMORY"
+class_name = "SessionMemory"
+
+[[migrations]]
+tag = "v1"
+
+new_sqlite_classes = [
+  "SessionMemory"
+]
