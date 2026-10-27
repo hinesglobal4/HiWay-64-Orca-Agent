@@ -1,4 +1,4 @@
-name = "hi-way-orca-agent"
+name = "hiway-64-orca-agent"
 
 main = "src/index.ts"
 
