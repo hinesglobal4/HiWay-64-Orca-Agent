@@ -1,3 +1,7 @@
+interface Env {
+  AI: Ai;
+}
+
 import { WorkersAIService } from "./services/workersAI";
 import { ResearchAgent } from "./agents/researchAgent";
 import { RiskAgent } from "./agents/riskAgent";
